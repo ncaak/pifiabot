@@ -17,7 +17,11 @@ func main() {
 
 	fmt.Println("INFO :: Starting the server...")
 
-	var service = server.Build()
+	var service, err = server.Build()
+	if err != nil {
+		log.Println("ERROR :: There was an error when building the service")
+		log.Fatal(err)
+	}
 
 	service.AddRoute("/v1/bot-api", webhook)
 

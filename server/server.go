@@ -2,7 +2,7 @@ package server
 
 import (
 	"crypto/tls"
-	"log"
+	"errors"
 	"net/http"
 	"time"
 )
@@ -12,16 +12,16 @@ type server struct {
 	mux   *http.ServeMux
 }
 
-func Build() *server {
+func Build() (*server, error) {
 	var cert, err = tls.LoadX509KeyPair("cert.pem", "private.key")
 	if err != nil {
-		log.Fatalf("ERROR :: Security keys could not be retrieved : %v", err.Error())
+		return &server{}, errors.New("ERROR :: Security keys could not be retrieved : " + err.Error())
 	}
 
 	return &server{
 		certs: []tls.Certificate{cert},
 		mux:   http.NewServeMux(),
-	}
+	}, nil
 }
 
 func (s server) AddRoute(method string, logic func(http.ResponseWriter, *http.Request)) {
