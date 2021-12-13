@@ -1,0 +1,10 @@
+# local files
+api-token
+cert.pem
+private.key
+
+# golang files
+go.mod
+
+# temp files
+scratch*
