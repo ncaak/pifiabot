@@ -6,8 +6,9 @@ import (
 	"io"
 	"log"
 	"net/http"
-	"strconv"
+	"os"
 
+	"github.com/ncaak/pifiabot/client"
 	"github.com/ncaak/pifiabot/models"
 	"github.com/ncaak/pifiabot/server"
 )
@@ -26,8 +27,8 @@ func getInput(body io.ReadCloser) (input models.Input) {
 	}
 
 	return models.Input{
-		ChatId:    strconv.Itoa(update.Message.Chat.Id),
-		MessageId: strconv.Itoa(update.Message.Id),
+		ChatId:    update.Message.Chat.Id,
+		MessageId: update.Message.Id,
 		Text:      update.Message.Text,
 	}
 }
@@ -36,9 +37,23 @@ func webhook(w http.ResponseWriter, r *http.Request) {
 	log.Println("INFO :: Request received")
 
 	var input = getInput(r.Body)
-	log.Println(input)
 
-	// TODO : Handle command
+	var emptyInput models.Input
+	if input != emptyInput {
+
+		// TODO : Handle command
+
+		var telegram = client.Build(os.Getenv("BOT_TOKEN"))
+
+		// stub
+		var output = models.Output{
+			ChatId:    input.ChatId,
+			MessageId: input.MessageId,
+			Text:      "pong",
+		}
+
+		telegram.SendReply("sendMessage", output)
+	}
 
 }
 

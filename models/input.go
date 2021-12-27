@@ -1,7 +1,7 @@
 package models
 
 type Input struct {
-	ChatId    string
-	MessageId string
+	ChatId    int
+	MessageId int
 	Text      string
 }
