@@ -20,19 +20,6 @@ func Build(botToken string) client {
 	}
 }
 
-func (c client) sendRequest(r *http.Request) error {
-	var client = &http.Client{
-		Timeout: 30 * time.Second,
-	}
-
-	_, err := client.Do(r)
-	if err != nil {
-		log.Println("ERROR :: Sending HTTP request")
-	}
-
-	return err
-}
-
 func send(url string, body []byte) {
 	var req, errReq = http.NewRequest("POST", url, bytes.NewBuffer(body))
 	if errReq != nil {
@@ -49,20 +36,6 @@ func send(url string, body []byte) {
 	var _, errDo = client.Do(req)
 	if errDo != nil {
 		log.Println("ERROR :: Sending HTTP request : " + errReq.Error())
-	}
-}
-
-func (c client) SendReply(method string, body models.Output) {
-	var req, err = requests.Reply(c.Url+method, body)
-	if err != nil {
-		log.Println("ERROR :: Retrieving the request")
-		return
-	}
-
-	var errRequest = c.sendRequest(req)
-	if errRequest != nil {
-		log.Println("ERROR :: Sending Reply request")
-		return
 	}
 }
 
