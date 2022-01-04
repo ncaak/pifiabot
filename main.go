@@ -1,45 +1,38 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
-	"io"
 	"log"
 	"net/http"
-	"strconv"
+	"os"
 
+	"github.com/ncaak/pifiabot/client"
 	"github.com/ncaak/pifiabot/models"
 	"github.com/ncaak/pifiabot/server"
 )
 
-func getInput(body io.ReadCloser) (input models.Input) {
-	var update models.Update
-	var decoder = json.NewDecoder(body)
-	if err := decoder.Decode(&update); err != nil {
-		log.Println("INFO :: Decoding request body : " + err.Error())
-		return
-	}
+func handleUpdate(w http.ResponseWriter, r *http.Request) {
 
-	if entities := update.Message.Entities; len(entities) == 0 || entities[0].Type != "bot_command" {
-		log.Println("INFO :: Request body was not a Bot Command")
-		return
-	}
-
-	return models.Input{
-		ChatId:    strconv.Itoa(update.Message.Chat.Id),
-		MessageId: strconv.Itoa(update.Message.Id),
-		Text:      update.Message.Text,
-	}
-}
-
-func webhook(w http.ResponseWriter, r *http.Request) {
 	log.Println("INFO :: Request received")
 
-	var input = getInput(r.Body)
-	log.Println(input)
+	defer r.Body.Close()
 
-	// TODO : Handle command
+	var input = server.GetInput(r.Body)
 
+	if input.IsCommand {
+
+		// TODO : Handle command
+
+		// stub
+		var output = models.Output{
+			ChatId:    input.ChatId,
+			MessageId: input.MessageId,
+			Text:      "pong",
+		}
+
+		var telegram = client.Build(os.Getenv("BOT_TOKEN")) // TODO : Move ENV to configuration
+		telegram.SendMessage(output)
+	}
 }
 
 func main() {
@@ -52,7 +45,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	service.AddRoute("/v1/bot-api", webhook)
+	service.AddRoute("/v1/bot-api", handleUpdate) // TODO : Path should be configurable
 
 	log.Fatal(
 		service.Listen("8443"),
