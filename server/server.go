@@ -5,6 +5,8 @@ import (
 	"errors"
 	"net/http"
 	"time"
+
+	"github.com/ncaak/pifiabot/config"
 )
 
 type server struct {
@@ -12,8 +14,8 @@ type server struct {
 	mux   *http.ServeMux
 }
 
-func Build() (*server, error) {
-	var cert, err = tls.LoadX509KeyPair("cert.pem", "private.key")
+func Build(cfg config.Config) (*server, error) {
+	var cert, err = tls.X509KeyPair(cfg.Certificate, cfg.PrivateKey)
 	if err != nil {
 		return &server{}, errors.New("ERROR :: Security keys could not be retrieved : " + err.Error())
 	}

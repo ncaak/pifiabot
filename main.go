@@ -1,12 +1,12 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 	"os"
 
 	"github.com/ncaak/pifiabot/client"
+	"github.com/ncaak/pifiabot/config"
 	"github.com/ncaak/pifiabot/models"
 	"github.com/ncaak/pifiabot/server"
 )
@@ -37,9 +37,15 @@ func handleUpdate(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 
-	fmt.Println("INFO :: Starting the server...")
+	log.Println("INFO :: Setting up Configuration")
+	var cfg, errCfg = config.Setup()
+	if errCfg != nil {
+		log.Println("ERROR :: Setting up configuration")
+		log.Fatal(errCfg)
+	}
 
-	var service, err = server.Build()
+	log.Println("INFO :: Starting the server...")
+	var service, err = server.Build(cfg)
 	if err != nil {
 		log.Println("ERROR :: There was an error when building the service")
 		log.Fatal(err)
