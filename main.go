@@ -38,22 +38,21 @@ func handleUpdate(w http.ResponseWriter, r *http.Request) {
 func main() {
 
 	log.Println("INFO :: Setting up Configuration")
-	var cfg, errCfg = config.Setup()
-	if errCfg != nil {
+	if errcfg := config.Setup(); errcfg != nil {
 		log.Println("ERROR :: Setting up configuration")
-		log.Fatal(errCfg)
+		log.Fatal(errcfg)
 	}
 
 	log.Println("INFO :: Starting the server...")
-	var service, err = server.Build(cfg)
+	var service, err = server.Build(*config.Get())
 	if err != nil {
 		log.Println("ERROR :: There was an error when building the service")
 		log.Fatal(err)
 	}
 
-	service.AddRoute("/v1/bot-api", handleUpdate) // TODO : Path should be configurable
+	service.AddRoute(config.Get().Url.Path, handleUpdate)
 
 	log.Fatal(
-		service.Listen("8443"),
+		service.Listen(config.Get().Url.Port),
 	)
 }
