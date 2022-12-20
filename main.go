@@ -44,7 +44,7 @@ func main() {
 	}
 
 	log.Println("INFO :: Starting the server...")
-	var service, err = server.Build(*config.Get())
+	var service, err = server.Build(config.Get().Certificate, config.Get().PrivateKey)
 	if err != nil {
 		log.Println("ERROR :: There was an error when building the service")
 		log.Fatal(err)

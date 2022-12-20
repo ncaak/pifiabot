@@ -14,7 +14,7 @@ import (
 	"time"
 )
 
-type Config struct {
+type config struct {
 	Certificate []byte
 	PrivateKey  []byte
 	BotToken    string
@@ -25,14 +25,14 @@ type Config struct {
 	}
 }
 
-var configuration *Config
+var configuration *config
 
-func Get() *Config {
+func Get() *config {
 	return configuration
 }
 
 func Setup() error {
-	var config = Config{}
+	var config = config{}
 	config.Url.Path = "/v1/bot-api"
 	config.Url.Port = "8443"
 
@@ -50,7 +50,7 @@ func Setup() error {
 	return nil
 }
 
-func (c *Config) getEnvData() (err error) {
+func (c *config) getEnvData() (err error) {
 	if c.BotToken, err = getEnvVariable("BOT_TOKEN"); err != nil {
 		return err
 	}
@@ -62,7 +62,7 @@ func (c *Config) getEnvData() (err error) {
 	return
 }
 
-func (c *Config) setKeyPair() error {
+func (c *config) setKeyPair() error {
 	var rsaKey, errGenKey = rsa.GenerateKey(rand.Reader, 2048)
 	if errGenKey != nil {
 		return errors.New("ERROR :: Generating RSA key : " + errGenKey.Error())
