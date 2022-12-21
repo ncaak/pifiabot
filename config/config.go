@@ -33,7 +33,7 @@ func Get() *config {
 
 func Setup() error {
 	var config = config{}
-	config.Url.Path = "/v1/bot-api"
+	config.Url.Path = "v1/bot-api"
 	config.Url.Port = "8443"
 
 	if err := config.getEnvData(); err != nil {
@@ -48,6 +48,10 @@ func Setup() error {
 
 	configuration = &config
 	return nil
+}
+
+func (c *config) GetEndpoint() string {
+	return fmt.Sprintf("https://%s:%s/%s", c.Url.Endpoint, c.Url.Port, c.Url.Path)
 }
 
 func (c *config) getEnvData() (err error) {

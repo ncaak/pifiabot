@@ -3,7 +3,6 @@ package main
 import (
 	"log"
 	"net/http"
-	"os"
 
 	"github.com/ncaak/pifiabot/client"
 	"github.com/ncaak/pifiabot/config"
@@ -30,17 +29,25 @@ func handleUpdate(w http.ResponseWriter, r *http.Request) {
 			Text:      "pong",
 		}
 
-		var telegram = client.Build(os.Getenv("BOT_TOKEN")) // TODO : Move ENV to configuration
-		telegram.SendMessage(output)
+		client.Get().SendMessage(output)
 	}
 }
 
 func main() {
 
 	log.Println("INFO :: Setting up Configuration")
-	if errcfg := config.Setup(); errcfg != nil {
-		log.Println("ERROR :: Setting up configuration")
-		log.Fatal(errcfg)
+	if err := config.Setup(); err != nil {
+		log.Fatal(err)
+	}
+
+	log.Println("INFO :: Setting up Webhook")
+	client.Setup(config.Get().BotToken)
+	var webhook = models.SetWebhook{
+		Url:         config.Get().GetEndpoint(),
+		Certificate: config.Get().Certificate,
+	}
+	if err := client.Get().SetWebhook(webhook); err != nil {
+		log.Fatal(err)
 	}
 
 	log.Println("INFO :: Starting the server...")
