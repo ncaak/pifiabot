@@ -4,7 +4,9 @@ import (
 	"bytes"
 	"encoding/json"
 	"log"
+	"mime/multipart"
 	"net/http"
+	"net/http/httputil"
 	"time"
 
 	"github.com/ncaak/pifiabot/models"
@@ -50,4 +52,42 @@ func send(url string, body []byte) {
 	if errDo != nil {
 		log.Println("ERROR :: Sending HTTP request : " + errReq.Error())
 	}
+}
+
+func getMultipartBody(data models.SetWebhook) (*bytes.Buffer, string) {
+	var body = &bytes.Buffer{}
+	var writer = multipart.NewWriter(body)
+	defer writer.Close()
+
+	writer.WriteField("url", data.Url)
+	cert, _ := writer.CreateFormField("certificate")
+	cert.Write(data.Certificate)
+
+	// writer.CreateFormFile()
+	return body, writer.FormDataContentType()
+}
+
+func getMultipartRequest(url string, body *bytes.Buffer, contentType string) (*http.Request, error) {
+	var req, err = http.NewRequest("POST", url, body)
+	if err != nil {
+		log.Println("ERROR :: Creating Multipart Request")
+		return req, err
+	}
+
+	req.Header.Set("Content-Type", contentType)
+
+	return req, nil
+}
+
+func debugRequest(req *http.Request) {
+	requestDump, _ := httputil.DumpRequestOut(req, true)
+
+	log.Printf("DEBUG :: Request dump : \n%s\n", string(requestDump)) // TODO : Activate this on "debug" configuration
+}
+
+func debugResponse(resp *http.Response) {
+	responseDump, _ := httputil.DumpResponse(resp, true)
+
+	log.Printf("DEBUG :: Response dump : \n%s\n", string(responseDump)) // TODO : Activate this on "debug" configuration
+
 }
