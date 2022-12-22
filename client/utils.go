@@ -3,6 +3,8 @@ package client
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
+	"io"
 	"log"
 	"mime/multipart"
 	"net/http"
@@ -67,8 +69,10 @@ func getMultipartBody(data models.SetWebhook) (*bytes.Buffer, string) {
 	return body, writer.FormDataContentType()
 }
 
-func getMultipartRequest(url string, body *bytes.Buffer, contentType string) (*http.Request, error) {
-	var req, err = http.NewRequest("POST", url, body)
+func getMultipartRequest(method string, data models.SetWebhook) (*http.Request, error) {
+	var body, contentType = getMultipartBody(data)
+
+	var req, err = http.NewRequest("POST", method, body)
 	if err != nil {
 		log.Println("ERROR :: Creating Multipart Request")
 		return req, err
@@ -89,5 +93,14 @@ func debugResponse(resp *http.Response) {
 	responseDump, _ := httputil.DumpResponse(resp, true)
 
 	log.Printf("DEBUG :: Response dump : \n%s\n", string(responseDump)) // TODO : Activate this on "debug" configuration
+}
 
+func handleFailedResponse(resp *http.Response) string {
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return err.Error()
+	}
+	defer resp.Body.Close()
+
+	return fmt.Sprintf("HTTP Code %d :\n%s\n", resp.StatusCode, body)
 }

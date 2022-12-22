@@ -1,6 +1,7 @@
 package client
 
 import (
+	"errors"
 	"log"
 	"net/http"
 	"time"
@@ -30,9 +31,8 @@ func Setup(botToken string) {
 	client = &api
 }
 
-func (api telegram) SetWebhook(webhook models.SetWebhook) error {
-	body, contentType := getMultipartBody(webhook)
-	var req, errReq = getMultipartRequest(api.getEndpoint("setWebhook"), body, contentType)
+func (api telegram) SetWebhook(data models.SetWebhook) error {
+	var req, errReq = getMultipartRequest(api.getEndpoint("setWebhook"), data)
 	if errReq != nil {
 		log.Println("ERROR :: Setting up SetWebhook request")
 		return errReq
@@ -47,6 +47,11 @@ func (api telegram) SetWebhook(webhook models.SetWebhook) error {
 	}
 
 	debugResponse(resp)
+
+	if resp.StatusCode != 200 {
+		log.Println("ERROR :: Request was not successful")
+		return errors.New(handleFailedResponse(resp))
+	}
 
 	return nil
 }
