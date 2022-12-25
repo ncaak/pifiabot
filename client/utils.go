@@ -62,10 +62,9 @@ func getMultipartBody(data models.SetWebhook) (*bytes.Buffer, string) {
 	defer writer.Close()
 
 	writer.WriteField("url", data.Url)
-	cert, _ := writer.CreateFormField("certificate")
+	cert, _ := writer.CreateFormFile("certificate", "cert.pem")
 	cert.Write(data.Certificate)
 
-	// writer.CreateFormFile()
 	return body, writer.FormDataContentType()
 }
 
