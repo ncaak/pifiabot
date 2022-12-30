@@ -44,22 +44,20 @@ func main() {
 	client.Setup(config.Get().BotToken)
 	var webhook = models.SetWebhook{
 		Url:         config.Get().GetEndpoint(),
-		Certificate: config.Get().Certificate,
+		Certificate: config.Get().CertBytes,
 	}
 	if err := client.Get().SetWebhook(webhook); err != nil {
 		log.Fatal(err)
 	}
 
 	log.Println("INFO :: Starting the server...")
-	var service, err = server.Build(config.Get().Certificate, config.Get().PrivateKey)
-	if err != nil {
-		log.Println("ERROR :: There was an error when building the service")
-		log.Fatal(err)
-	}
-
-	service.AddRoute(config.Get().Url.Path, handleUpdate)
+	http.HandleFunc("/"+config.Get().Url.Path, handleUpdate)
 
 	log.Fatal(
-		service.Listen(config.Get().Url.Port),
+		http.ListenAndServeTLS(
+			":"+config.Get().Url.Port,
+			config.Get().CertFilePath,
+			config.Get().KeyFilePath,
+			nil),
 	)
 }
