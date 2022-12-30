@@ -1,24 +1,16 @@
 package config
 
 import (
-	"crypto/rand"
-	"crypto/rsa"
-	"crypto/x509"
-	"crypto/x509/pkix"
-	"encoding/pem"
-	"errors"
 	"fmt"
 	"log"
-	"math/big"
 	"os"
-	"time"
 )
 
 type config struct {
-	Certificate []byte
-	PrivateKey  []byte
-	BotToken    string
-	Url         struct {
+	CertFilePath string
+	KeyFilePath  string
+	BotToken     string
+	Url          struct {
 		Endpoint string
 		Path     string
 		Port     string
@@ -33,16 +25,13 @@ func Get() *config {
 
 func Setup() error {
 	var config = config{}
-	config.Url.Path = "v1/bot-api"
+	config.Url.Path = "updates"
 	config.Url.Port = "8443"
+	config.CertFilePath = "cert.pem"
+	config.KeyFilePath = "private.key"
 
 	if err := config.getEnvData(); err != nil {
 		log.Println("ERROR :: Retrieving Env variables")
-		return err
-	}
-
-	if err := config.setKeyPair(); err != nil {
-		log.Println("ERROR :: Setting up Server keys")
 		return err
 	}
 
@@ -64,63 +53,6 @@ func (c *config) getEnvData() (err error) {
 	}
 
 	return
-}
-
-func (c *config) setKeyPair() error {
-	var rsaKey, errGenKey = rsa.GenerateKey(rand.Reader, 2048)
-	if errGenKey != nil {
-		return errors.New("ERROR :: Generating RSA key : " + errGenKey.Error())
-	}
-	var privateKey = x509.MarshalPKCS1PrivateKey(rsaKey)
-	c.PrivateKey = pem.EncodeToMemory(&pem.Block{Type: "RSA PRIVATE KEY", Bytes: privateKey})
-
-	var certificate, errCert = getCertificateBytes(rsaKey)
-	if errCert != nil {
-		return errCert
-	}
-	c.Certificate = pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: certificate})
-
-	return nil
-}
-
-func getCertificateBytes(privateKey *rsa.PrivateKey) ([]byte, error) {
-	var template, errTemplate = getCertificateTemplate()
-	if errTemplate != nil {
-		log.Println("ERROR :: Creating certificate's template")
-		return []byte{}, errTemplate
-	}
-
-	var certBytes, errCert = x509.CreateCertificate(rand.Reader, &template, &template, &privateKey.PublicKey, privateKey)
-	if errCert != nil {
-		log.Println("ERROR :: Creating certificate")
-		return []byte{}, errCert
-	}
-
-	return certBytes, nil
-}
-
-func getCertificateTemplate() (x509.Certificate, error) {
-	var limit = new(big.Int).Lsh(big.NewInt(1), 128)
-	var serial, err = rand.Int(rand.Reader, limit)
-	if err != nil {
-		return x509.Certificate{}, errors.New("ERROR :: Generating random serial : " + err.Error())
-	}
-
-	var template = x509.Certificate{
-		SerialNumber: serial,
-		Subject: pkix.Name{
-			Organization: []string{"pifiabot"},
-			Country:      []string{"ES"},
-		},
-		NotBefore:             time.Now(),
-		NotAfter:              time.Now().AddDate(0, 0, 365),
-		KeyUsage:              x509.KeyUsageKeyEncipherment | x509.KeyUsageDigitalSignature | x509.KeyUsageCertSign,
-		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
-		BasicConstraintsValid: true,
-		IsCA:                  true,
-	}
-
-	return template, nil
 }
 
 func getEnvVariable(name string) (string, error) {

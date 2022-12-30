@@ -1,7 +1,5 @@
 # local files
-api-token
-cert.pem
-private.key
+deploy
 
 # temp files
 scratch*
