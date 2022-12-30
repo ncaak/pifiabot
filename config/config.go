@@ -2,14 +2,16 @@ package config
 
 import (
 	"fmt"
+	"io"
 	"log"
 	"os"
 )
 
 type config struct {
-	CertFilePath string
-	KeyFilePath  string
 	BotToken     string
+	CertFilePath string
+	CertBytes    []byte
+	KeyFilePath  string
 	Url          struct {
 		Endpoint string
 		Path     string
@@ -35,12 +37,30 @@ func Setup() error {
 		return err
 	}
 
+	b, err := config.getCertificateBytes()
+	if err != nil {
+		log.Println("ERROR :: Reading Certificate file")
+	}
+	config.CertBytes = b
+
 	configuration = &config
 	return nil
 }
 
 func (c *config) GetEndpoint() string {
 	return fmt.Sprintf("https://%s:%s/%s", c.Url.Endpoint, c.Url.Port, c.Url.Path)
+}
+
+func (c *config) getCertificateBytes() ([]byte, error) {
+	var file, err = os.Open(c.CertFilePath)
+	if err != nil {
+		log.Println("ERROR :: Opening Certificate file")
+		return []byte{}, err
+	}
+
+	defer file.Close()
+
+	return io.ReadAll(file)
 }
 
 func (c *config) getEnvData() (err error) {
