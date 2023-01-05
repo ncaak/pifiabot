@@ -38,7 +38,7 @@ func (api telegram) SetWebhook(data models.SetWebhook) error {
 		return errReq
 	}
 
-	debugRequest(req)
+	//debugRequest(req) TODO: explicit debug mode
 
 	var resp, errDo = api.Client.Do(req)
 	if errDo != nil {
@@ -46,7 +46,7 @@ func (api telegram) SetWebhook(data models.SetWebhook) error {
 		return errDo
 	}
 
-	debugResponse(resp)
+	//debugResponse(resp)
 
 	if resp.StatusCode != 200 {
 		log.Println("ERROR :: Request was not successful")
