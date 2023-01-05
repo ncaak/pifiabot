@@ -1,12 +1,11 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net/http"
-	"os"
 
 	"github.com/ncaak/pifiabot/client"
+	"github.com/ncaak/pifiabot/config"
 	"github.com/ncaak/pifiabot/models"
 	"github.com/ncaak/pifiabot/server"
 )
@@ -30,24 +29,35 @@ func handleUpdate(w http.ResponseWriter, r *http.Request) {
 			Text:      "pong",
 		}
 
-		var telegram = client.Build(os.Getenv("BOT_TOKEN")) // TODO : Move ENV to configuration
-		telegram.SendMessage(output)
+		client.Get().SendMessage(output)
 	}
 }
 
 func main() {
 
-	fmt.Println("INFO :: Starting the server...")
-
-	var service, err = server.Build()
-	if err != nil {
-		log.Println("ERROR :: There was an error when building the service")
+	log.Println("INFO :: Setting up Configuration")
+	if err := config.Setup(); err != nil {
 		log.Fatal(err)
 	}
 
-	service.AddRoute("/v1/bot-api", handleUpdate) // TODO : Path should be configurable
+	log.Println("INFO :: Setting up Webhook")
+	client.Setup(config.Get().BotToken)
+	var webhook = models.SetWebhook{
+		Url:         config.Get().GetEndpoint(),
+		Certificate: config.Get().CertBytes,
+	}
+	if err := client.Get().SetWebhook(webhook); err != nil {
+		log.Fatal(err)
+	}
+
+	log.Println("INFO :: Starting the server...")
+	http.HandleFunc("/"+config.Get().Url.Path, handleUpdate)
 
 	log.Fatal(
-		service.Listen("8443"),
+		http.ListenAndServeTLS(
+			":"+config.Get().Url.Port,
+			config.Get().CertFilePath,
+			config.Get().KeyFilePath,
+			nil),
 	)
 }

@@ -5,3 +5,8 @@ type Output struct {
 	MessageId int
 	Text      string
 }
+
+type SetWebhook struct {
+	Url         string
+	Certificate []byte
+}

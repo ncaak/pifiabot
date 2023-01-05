@@ -1,43 +1,37 @@
 package server
 
 import (
-	"crypto/tls"
-	"errors"
-	"net/http"
-	"time"
+	"encoding/json"
+	"io"
+	"log"
+
+	"github.com/ncaak/pifiabot/models"
 )
 
-type server struct {
-	certs []tls.Certificate
-	mux   *http.ServeMux
+func GetInput(body io.ReadCloser) models.Input {
+	var input = getInputFromUpdate(
+		getUpdate(body),
+	)
+
+	return input
 }
 
-func Build() (*server, error) {
-	var cert, err = tls.LoadX509KeyPair("cert.pem", "private.key")
-	if err != nil {
-		return &server{}, errors.New("ERROR :: Security keys could not be retrieved : " + err.Error())
+func getInputFromUpdate(update models.Update) models.Input {
+	var entities = update.Message.Entities
+
+	return models.Input{
+		ChatId:    update.Message.Chat.Id,
+		IsCommand: len(entities) > 0 && entities[0].Type == "bot_command",
+		MessageId: update.Message.Id,
+		Text:      update.Message.Text,
+	}
+}
+
+func getUpdate(body io.ReadCloser) (update models.Update) {
+	var decoder = json.NewDecoder(body)
+	if err := decoder.Decode(&update); err != nil {
+		log.Println("ERROR :: Decoding request body : " + err.Error())
 	}
 
-	return &server{
-		certs: []tls.Certificate{cert},
-		mux:   http.NewServeMux(),
-	}, nil
-}
-
-func (s server) AddRoute(method string, logic func(http.ResponseWriter, *http.Request)) {
-	s.mux.HandleFunc(method, logic)
-}
-
-func (s server) Listen(port string) error {
-	var httpServer = &http.Server{
-		Addr:    ":" + port,
-		Handler: s.mux,
-		TLSConfig: &tls.Config{
-			Certificates: s.certs,
-		},
-		ReadTimeout:  5 * time.Second,
-		WriteTimeout: 10 * time.Second,
-	}
-
-	return httpServer.ListenAndServeTLS("", "")
+	return
 }

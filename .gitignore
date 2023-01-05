@@ -1,10 +1,9 @@
 # local files
-api-token
-cert.pem
-private.key
-
-# golang files
-go.mod
+deploy
 
 # temp files
 scratch*
+Makefile
+
+# ide files
+.vscode
