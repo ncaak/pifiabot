@@ -4,31 +4,36 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/ncaak/pifiabot/actions"
 	"github.com/ncaak/pifiabot/client"
 	"github.com/ncaak/pifiabot/config"
 	"github.com/ncaak/pifiabot/models"
-	"github.com/ncaak/pifiabot/server"
+	"github.com/ncaak/pifiabot/utils"
 )
 
 func handleUpdate(w http.ResponseWriter, r *http.Request) {
 
 	log.Println("INFO :: Request received")
-
-	defer r.Body.Close()
-
-	var input = server.GetInput(r.Body)
+	var input, err = utils.GetRequestInput(r.Body)
+	if err != nil {
+		log.Println("ERROR :: Reading Telegram request : " + err.Error())
+		return
+	}
 
 	if input.IsCommand {
 
-		// TODO : Handle command
+		var command = actions.Factory(input.Text)
+		var response, err = command.Resolve()
+		if err != nil {
+			log.Println("ERROR :: Resolving a command : " + err.Error()) // TODO: send message with command help
+			return
+		}
 
-		// stub
 		var output = models.Output{
 			ChatId:    input.ChatId,
 			MessageId: input.MessageId,
-			Text:      "pong",
+			Text:      response,
 		}
-
 		client.Get().SendMessage(output)
 	}
 }
