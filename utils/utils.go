@@ -1,4 +1,4 @@
-package server
+package utils
 
 import (
 	"encoding/json"
@@ -8,12 +8,18 @@ import (
 	"github.com/ncaak/pifiabot/models"
 )
 
-func GetInput(body io.ReadCloser) models.Input {
-	var input = getInputFromUpdate(
-		getUpdate(body),
-	)
+func GetRequestInput(body io.ReadCloser) (models.Input, error) {
+	var update models.Update
+	defer body.Close()
 
-	return input
+	var decoder = json.NewDecoder(body)
+	if err := decoder.Decode(&update); err != nil {
+		log.Println("ERROR :: Decoding Update structure")
+		return models.Input{}, err
+	}
+
+	input := getInputFromUpdate(update)
+	return input, nil
 }
 
 func getInputFromUpdate(update models.Update) models.Input {
@@ -25,13 +31,4 @@ func getInputFromUpdate(update models.Update) models.Input {
 		MessageId: update.Message.Id,
 		Text:      update.Message.Text,
 	}
-}
-
-func getUpdate(body io.ReadCloser) (update models.Update) {
-	var decoder = json.NewDecoder(body)
-	if err := decoder.Decode(&update); err != nil {
-		log.Println("ERROR :: Decoding request body : " + err.Error())
-	}
-
-	return
 }

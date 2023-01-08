@@ -9,19 +9,19 @@ import (
 	"github.com/ncaak/pifiabot/models"
 )
 
-type telegram struct {
+type API struct {
 	Client *http.Client
 	Url    string
 }
 
-var client *telegram
+var client *API
 
-func Get() *telegram {
+func Get() *API {
 	return client
 }
 
 func Setup(botToken string) {
-	var api = telegram{
+	var api = API{
 		Client: &http.Client{
 			Timeout: 30 * time.Second,
 		},
@@ -31,7 +31,7 @@ func Setup(botToken string) {
 	client = &api
 }
 
-func (api telegram) SetWebhook(data models.SetWebhook) error {
+func (api API) SetWebhook(data models.SetWebhook) error {
 	var req, errReq = getMultipartRequest(api.getEndpoint("setWebhook"), data)
 	if errReq != nil {
 		log.Println("ERROR :: Setting up SetWebhook request")
@@ -56,7 +56,7 @@ func (api telegram) SetWebhook(data models.SetWebhook) error {
 	return nil
 }
 
-func (api telegram) SendMessage(data models.Output) {
+func (api API) SendMessage(data models.Output) {
 	var endpoint = api.getEndpoint("sendMessage")
 	var body = getReplyJson(data)
 
@@ -65,6 +65,6 @@ func (api telegram) SendMessage(data models.Output) {
 	}
 }
 
-func (api telegram) getEndpoint(method string) string {
+func (api API) getEndpoint(method string) string {
 	return api.Url + method
 }
