@@ -1,6 +1,7 @@
 package config
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"log"
@@ -8,11 +9,15 @@ import (
 )
 
 type config struct {
-	BotToken     string
-	CertFilePath string
-	CertBytes    []byte
-	KeyFilePath  string
-	Url          struct {
+	BotToken  string
+	CertBytes []byte
+	File      struct {
+		Certificate string
+		Messages    string
+		PrivateKey  string
+	}
+	MessageDict map[string]string
+	Url         struct {
 		Endpoint string
 		Path     string
 		Port     string
@@ -27,21 +32,21 @@ func Get() *config {
 
 func Setup() error {
 	var config = config{}
-	config.Url.Path = "updates"
+	config.Url.Path = "updates" // TODO: Randomize url path
 	config.Url.Port = "8443"
-	config.CertFilePath = "cert.pem"
-	config.KeyFilePath = "private.key"
+	config.File.Certificate = "cert.pem"
+	config.File.PrivateKey = "private.key"
+	config.File.Messages = "messages.json"
 
 	if err := config.getEnvData(); err != nil {
 		log.Println("ERROR :: Retrieving Env variables")
 		return err
 	}
 
-	b, err := config.getCertificateBytes()
-	if err != nil {
-		log.Println("ERROR :: Reading Certificate file")
+	if err := config.getFileData(); err != nil {
+		log.Println("ERROR :: Retrieving files")
+		return err
 	}
-	config.CertBytes = b
 
 	configuration = &config
 	return nil
@@ -51,16 +56,13 @@ func (c *config) GetEndpoint() string {
 	return fmt.Sprintf("https://%s:%s/%s", c.Url.Endpoint, c.Url.Port, c.Url.Path)
 }
 
-func (c *config) getCertificateBytes() ([]byte, error) {
-	var file, err = os.Open(c.CertFilePath)
-	if err != nil {
-		log.Println("ERROR :: Opening Certificate file")
-		return []byte{}, err
+func (c *config) Message(entry string) string {
+	var msg, exist = c.MessageDict[entry]
+	if exist {
+		return msg
 	}
 
-	defer file.Close()
-
-	return io.ReadAll(file)
+	return fmt.Sprintf("No message for '%s' entry", entry)
 }
 
 func (c *config) getEnvData() (err error) {
@@ -75,6 +77,23 @@ func (c *config) getEnvData() (err error) {
 	return
 }
 
+func (c *config) getFileData() (err error) {
+	c.CertBytes, err = getFileBytes(c.File.Certificate)
+	if err != nil {
+		log.Println("ERROR :: Accesing Certificate file")
+		return
+	}
+
+	ba, err := getFileBytes(c.File.Messages)
+	if err != nil {
+		log.Println("ERROR :: Accesing Messages dictionary file")
+		return
+	}
+	json.Unmarshal(ba, &c.MessageDict)
+
+	return
+}
+
 func getEnvVariable(name string) (string, error) {
 	var value, isSet = os.LookupEnv(name)
 	if !isSet {
@@ -82,4 +101,16 @@ func getEnvVariable(name string) (string, error) {
 	}
 
 	return value, nil
+}
+
+func getFileBytes(filename string) ([]byte, error) {
+	var file, err = os.Open(filename)
+	if err != nil {
+		log.Println("ERROR :: Opening file")
+		return []byte{}, err
+	}
+
+	defer file.Close()
+
+	return io.ReadAll(file)
 }

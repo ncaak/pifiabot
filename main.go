@@ -61,8 +61,8 @@ func main() {
 	log.Fatal(
 		http.ListenAndServeTLS(
 			":"+config.Get().Url.Port,
-			config.Get().CertFilePath,
-			config.Get().KeyFilePath,
+			config.Get().File.Certificate,
+			config.Get().File.PrivateKey,
 			nil),
 	)
 }
