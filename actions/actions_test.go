@@ -5,26 +5,12 @@ import "testing"
 func TestBaseAction(t *testing.T) {
 	var baseAction = baseAction{}
 
-	t.Run("extractDice get an error if notation goes over the limit", func(t *testing.T) {
-		// Given
-		roll := "/command 000000000000000000000000000000000000000000"
-
-		// When
-		_, result := baseAction.extractDice(roll)
-
-		// Assert
-		if result == nil || result.Error() != "notation_max_length" {
-			t.Log("\nresult should be an error\ngot nil")
-			t.Fail()
-		}
-	})
-
 	t.Run("extractDice two items on the notation", func(t *testing.T) {
 		// Given
 		roll := "/command 1d20+2d4"
 
 		// When
-		result, _ := baseAction.extractDice(roll)
+		result := baseAction.extractDice(roll)
 
 		// Assert
 		if got := len(result); got != 2 {
@@ -38,7 +24,7 @@ func TestBaseAction(t *testing.T) {
 		roll := "/command d20"
 
 		// When
-		result, _ := baseAction.extractDice(roll)
+		result := baseAction.extractDice(roll)
 
 		// Assert
 		if got := len(result); got != 1 {
@@ -56,7 +42,7 @@ func TestBaseAction(t *testing.T) {
 		roll := "/command 1d20d8"
 
 		// When
-		result, _ := baseAction.extractDice(roll)
+		result := baseAction.extractDice(roll)
 
 		// Assert
 		if got := len(result); got != 1 {
@@ -74,7 +60,7 @@ func TestBaseAction(t *testing.T) {
 		roll := "/command 1d20-1d8"
 
 		// When
-		result, _ := baseAction.extractDice(roll)
+		result := baseAction.extractDice(roll)
 
 		// Assert
 		if got := len(result); got != 2 {
@@ -92,7 +78,7 @@ func TestBaseAction(t *testing.T) {
 		roll := "/command 4d6-L"
 
 		// When
-		result, _ := baseAction.extractDice(roll)
+		result := baseAction.extractDice(roll)
 
 		// Assert
 		if got := len(result); got != 1 {
@@ -101,6 +87,24 @@ func TestBaseAction(t *testing.T) {
 
 		} else if r := result[0]; r.Drop != "-L" {
 			t.Logf("\nresult expected to have -L drop suffix\ngot %s suffix", r.Drop)
+			t.Fail()
+		}
+	})
+}
+
+func TestRollAction(t *testing.T) {
+	var action = RollAction{}
+
+	t.Run("extractDice get an error if notation goes over the limit", func(t *testing.T) {
+		// Given
+		action.command = "/tira 000000000000000000000000000000000000000000000"
+
+		// When
+		_, result := action.Resolve()
+
+		// Assert
+		if result == nil || result.Error() != "notation_max_length" {
+			t.Logf("\nresult should be 'notation_max_length' error\ngot %s", result.Error())
 			t.Fail()
 		}
 	})
