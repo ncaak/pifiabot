@@ -90,21 +90,88 @@ func TestBaseAction(t *testing.T) {
 			t.Fail()
 		}
 	})
+
+	t.Run("extractBonus does not match on multiple dice notation", func(t *testing.T) {
+		// Given
+		roll := "/command 1d20+6d6"
+
+		// When
+		result := baseAction.extractBonus(roll)
+
+		// Assert
+		if got := len(result); got != 0 {
+			t.Log("\nresult expected to have 0 item\ngot ", got)
+			t.Fail()
+		}
+	})
+
+	t.Run("extractBonus multiple bonus", func(t *testing.T) {
+		// Given
+		roll := "/command 2d6+2 + 7"
+
+		// When
+		result := baseAction.extractBonus(roll)
+
+		// Assert
+		if got := len(result); got != 2 {
+			t.Log("\nresult expected to have 2 item\ngot ", got)
+			t.Fail()
+
+		} else if r := result[1]; r != "+7" {
+			t.Logf("\nresult expected to have '7'\ngot %s", r)
+			t.Fail()
+		}
+	})
+
+	t.Run("extractBonus negative and positive bonus mixed", func(t *testing.T) {
+		// Given
+		roll := "/command 2d6+2 -7"
+
+		// When
+		result := baseAction.extractBonus(roll)
+
+		// Assert
+		if got := len(result); got != 2 {
+			t.Log("\nresult expected to have 2 item\ngot ", got)
+			t.Fail()
+
+		} else if r := result[1]; r != "-7" {
+			t.Logf("\nresult expected to have '-7'\ngot %s", r)
+			t.Fail()
+		}
+	})
+
 }
 
 func TestRollAction(t *testing.T) {
 	var action = RollAction{}
 
-	t.Run("extractDice get an error if notation goes over the limit", func(t *testing.T) {
+	t.Run("Resolve returns 'unknown_action' error if command is not correct", func(t *testing.T) {
 		// Given
-		action.command = "/tira 000000000000000000000000000000000000000000000"
+		action.command = "/tirar"
+		expectedError := "unknown_action"
 
 		// When
 		_, result := action.Resolve()
 
 		// Assert
-		if result == nil || result.Error() != "notation_max_length" {
-			t.Logf("\nresult should be 'notation_max_length' error\ngot %s", result.Error())
+		if result == nil || result.Error() != expectedError {
+			t.Logf("\nresult should be '%s' error\ngot %s", expectedError, result.Error())
+			t.Fail()
+		}
+	})
+
+	t.Run("Resolve returns 'notation_max_length' error if notation length goes over the limit", func(t *testing.T) {
+		// Given
+		action.command = "/tira 000000000000000000000000000000000000000000000"
+		expectedError := "notation_max_length"
+
+		// When
+		_, result := action.Resolve()
+
+		// Assert
+		if result == nil || result.Error() != expectedError {
+			t.Logf("\nresult should be '%s' error\ngot %s", expectedError, result.Error())
 			t.Fail()
 		}
 	})
