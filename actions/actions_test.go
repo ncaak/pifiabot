@@ -1,37 +1,56 @@
 package actions
 
-import "testing"
+import (
+	"reflect"
+	"testing"
+)
+
+func TestActionsFactory(t *testing.T) {
+	t.Run("unknown command returns an UnknownAction instance", func(t *testing.T) {
+		// When
+		test := Factory("/mock")
+
+		// Assert
+		if action := reflect.TypeOf(test).String(); action != "actions.UnknownAction" {
+			t.Logf("\nresult expected to be 'actions.UnknownAction'\ngot '%s' instead", action)
+			t.Fail()
+		}
+	})
+
+	t.Run("command length is over the limit returns an ErrorAction instance", func(t *testing.T) {
+		// When
+		test := Factory("/tira 000000000000000000000000000000000000000000000")
+
+		// Assert
+		if action := reflect.TypeOf(test).String(); action != "actions.ErrorAction" {
+			t.Logf("\nresult expected to be 'actions.ErrorAction'\ngot '%s' instead", action)
+			t.Fail()
+		}
+	})
+
+	t.Run("'tira' command returns a RollAction instance", func(t *testing.T) {
+		// When
+		test := Factory("/tira 1d20")
+
+		// Assert
+		if action := reflect.TypeOf(test).String(); action != "actions.RollAction" {
+			t.Logf("\nresult expected to be 'actions.RollAction'\ngot '%s' instead", action)
+			t.Fail()
+		}
+	})
+
+	t.Run("'t' command returns a RollAction instance", func(t *testing.T) {
+		// When
+		test := Factory("/t 1d20")
+
+		// Assert
+		if action := reflect.TypeOf(test).String(); action != "actions.RollAction" {
+			t.Logf("\nresult expected to be 'actions.RollAction'\ngot '%s' instead", action)
+			t.Fail()
+		}
+	})
+}
 
 func TestRollAction(t *testing.T) {
-	var action = RollAction{}
 
-	t.Run("Resolve returns 'unknown_action' error if command is not correct", func(t *testing.T) {
-		// Given
-		action.command = "/tirar"
-		expectedError := "unknown_action"
-
-		// When
-		_, result := action.Resolve()
-
-		// Assert
-		if result == nil || result.Error() != expectedError {
-			t.Logf("\nresult should be '%s' error\ngot %s", expectedError, result.Error())
-			t.Fail()
-		}
-	})
-
-	t.Run("Resolve returns 'notation_max_length' error if notation length goes over the limit", func(t *testing.T) {
-		// Given
-		action.command = "/tira 000000000000000000000000000000000000000000000"
-		expectedError := "notation_max_length"
-
-		// When
-		_, result := action.Resolve()
-
-		// Assert
-		if result == nil || result.Error() != expectedError {
-			t.Logf("\nresult should be '%s' error\ngot %s", expectedError, result.Error())
-			t.Fail()
-		}
-	})
 }
