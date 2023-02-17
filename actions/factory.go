@@ -2,9 +2,12 @@ package actions
 
 import "regexp"
 
+const REGEX_ROLL_ACTION = `^/(t|tira)(\s|$)`
+
 const MAX_COMMAND_LENGTH = 50
-const MSG_UNKNOWN_ACTION = "unknown_action"
 const ERR_UNKNOWN = "unknown_error"
+
+const MSG_UNKNOWN_ACTION = "unknown_action"
 
 type ActionInterface interface {
 	Resolve() (string, error)
@@ -17,8 +20,7 @@ func Factory(command string) ActionInterface {
 
 	switch {
 	// TODO: Define commands as they are coded
-	// case strings.HasPrefix(command, "/t"):
-	case regexp.MustCompile(`^/(t|tira)(\s|$)`).MatchString(command):
+	case regexp.MustCompile(REGEX_ROLL_ACTION).MatchString(command):
 		return RollAction{command: command}
 	default:
 		return UnknownAction{}
