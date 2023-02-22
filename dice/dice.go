@@ -1,23 +1,45 @@
 package dice
 
+import (
+	"fmt"
+	"strconv"
+)
+
+const MAX_DICE_NUMER = 20
+const MAX_DICE_FACES = 100
+
 // TODO : Unexport struct and make it work as interface
 type Dice struct {
-	Symbol string
-	Number string
-	Faces  string
-	Drop   string
+	Algebra string
+	Symbol  string
+	Number  string
+	Faces   string
+	Drop    string
+	number  int
+	faces   int
 }
 
-func NewDice(symbol string, number string, faces string, drop string) (d Dice) {
-	d.Number = number
-	d.Faces = faces
-	d.Symbol = symbol
-	d.Drop = drop
+func (d *Dice) PreCheck() error {
+	var err error
 
-	// No number on the die notation is allowed and it is handled as 1 die [d20 == 1d20]
-	if number == "" {
-		d.Number = "1"
+	if d.Number == "" {
+		d.number = 1
+
+	} else {
+		d.number, err = strconv.Atoi(d.Number)
+		if err != nil || d.number < 1 || d.number > MAX_DICE_NUMER {
+			return fmt.Errorf("dice_number")
+		}
 	}
 
-	return
+	d.faces, err = strconv.Atoi(d.Faces)
+	if err != nil || d.faces < 1 || d.faces > MAX_DICE_FACES {
+		return fmt.Errorf("faces_number")
+	}
+
+	return err
+}
+
+func (d Dice) Roll() []int {
+	return []int{}
 }
