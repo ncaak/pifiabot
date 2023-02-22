@@ -2,7 +2,7 @@ package dice
 
 import "testing"
 
-func TestBaseAction(t *testing.T) {
+func TestNotation(t *testing.T) {
 
 	t.Run("extractDice two items on the notation", func(t *testing.T) {
 		// Given
