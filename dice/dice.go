@@ -2,7 +2,9 @@ package dice
 
 import (
 	"fmt"
+	"math/rand"
 	"strconv"
+	"time"
 )
 
 const MAX_DICE_NUMER = 20
@@ -40,6 +42,16 @@ func (d *Dice) PreCheck() error {
 	return err
 }
 
-func (d Dice) Roll() []int {
-	return []int{}
+func (d Dice) Roll() (results []int, total int) {
+	rand.Seed(time.Now().UnixNano())
+
+	i := 0
+	for i < d.number {
+		r := rand.Intn(d.faces) + 1
+		results = append(results, r)
+		total += r
+		i++
+	}
+
+	return
 }

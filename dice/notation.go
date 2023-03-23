@@ -11,7 +11,7 @@ const REGEX_BONUS_NOTATION = `([+-]\d+)`
 type Notation struct {
 	dice  []Dice
 	text  string
-	Bonus string
+	bonus []string
 }
 
 func NewNotation(message string) (n Notation) {
@@ -19,6 +19,14 @@ func NewNotation(message string) (n Notation) {
 	n.dice = n.extractDice()
 
 	return
+}
+
+func (n Notation) GetDice() []Dice {
+	return n.dice
+}
+
+func (n Notation) GetBonus() []string {
+	return n.bonus
 }
 
 func (n Notation) extractBonus() []string {
