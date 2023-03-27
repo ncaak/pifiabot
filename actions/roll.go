@@ -13,7 +13,7 @@ type RollAction struct {
 
 func (a RollAction) Resolve() (string, error) {
 	var notation = dice.NewNotation(a.command)
-	var results = make(map[string][]int)
+	var message []string
 	var total int
 
 	d := notation.GetDice()
@@ -22,28 +22,26 @@ func (a RollAction) Resolve() (string, error) {
 		d = append(d, dice.D20())
 	}
 
+	// Append dice algebra and their results e.g. 1d20[20]
 	for _, dice := range d {
 		if err := dice.PreCheck(); err != nil {
 			return "", err
 		}
 
-		subtotal := 0
-		results[dice.Algebra], subtotal = dice.Roll()
+		results, subtotal := dice.Roll()
+
+		message = append(message, fmt.Sprintf("%s%v", dice.Algebra, results))
 		total += subtotal
 	}
 
-	// TODO Bonus
-
-	return a.format(results, total), nil
-}
-
-func (a RollAction) format(results map[string][]int, total int) string {
-	var msg []string
-	for k, v := range results {
-		msg = append(msg, fmt.Sprintf("%s%v", k, v))
+	// Append bonuses in case there are any
+	if bonusStr, bonusTotal := notation.GetBonusAndTotal(); bonusTotal > 0 {
+		message = append(message, bonusStr)
+		total += bonusTotal
 	}
 
-	msg = append(msg, fmt.Sprintf("= %d", total))
+	// Append total before sending the message
+	message = append(message, fmt.Sprintf("= %d", total))
 
-	return strings.Join(msg, " ")
+	return strings.Join(message, " "), nil
 }

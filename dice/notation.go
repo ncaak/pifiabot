@@ -2,10 +2,11 @@ package dice
 
 import (
 	"regexp"
+	"strconv"
 	"strings"
 )
 
-const REGEX_DICE_NOTATION = `([-\+\s])(\d*)d(\d+)(-[HL])?`
+const REGEX_DICE_NOTATION = `([-\+\s])\s?(\d*)d(\d+)(-[HL])?`
 const REGEX_BONUS_NOTATION = `([+-]\d+)`
 
 type Notation struct {
@@ -17,6 +18,7 @@ type Notation struct {
 func NewNotation(message string) (n Notation) {
 	n.text = message
 	n.dice = n.extractDice()
+	n.bonus = n.extractBonus()
 
 	return
 }
@@ -25,8 +27,17 @@ func (n Notation) GetDice() []Dice {
 	return n.dice
 }
 
-func (n Notation) GetBonus() []string {
-	return n.bonus
+func (n Notation) GetBonusAndTotal() (string, int) {
+	var total int
+	for _, b := range n.bonus {
+		t, err := strconv.Atoi(b)
+		if err != nil {
+			return "", 0
+		}
+		total += t
+	}
+
+	return strings.Join(n.bonus, ""), total
 }
 
 func (n Notation) extractBonus() []string {
