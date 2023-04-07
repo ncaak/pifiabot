@@ -23,19 +23,19 @@ func (a RollAction) Resolve() (string, error) {
 	}
 
 	// Append dice algebra and their results e.g. 1d20[20]
-	for _, dice := range d {
-		if err := dice.PreCheck(); err != nil {
+	for _, die := range d {
+		if err := die.PreCheck(); err != nil {
 			return "", err
 		}
 
-		results, subtotal := dice.Roll()
+		results, subtotal := die.Roll()
 
-		message = append(message, fmt.Sprintf("%s%v", dice.Algebra, results))
+		message = append(message, fmt.Sprintf("%s%v", die.GetAlgebra(), results))
 		total += subtotal
 	}
 
 	// Append bonuses in case there are any
-	if bonusStr, bonusTotal := notation.GetBonusAndTotal(); bonusTotal > 0 {
+	if bonusStr, bonusTotal := notation.GetBonusAndTotal(); bonusStr != "" {
 		message = append(message, bonusStr)
 		total += bonusTotal
 	}
@@ -45,3 +45,5 @@ func (a RollAction) Resolve() (string, error) {
 
 	return strings.Join(message, " "), nil
 }
+
+// TODO> drops
