@@ -49,7 +49,12 @@ func (d Dice) Roll() (results []int, total int) {
 	for i < d.number {
 		r := rand.Intn(d.faces) + 1
 		results = append(results, r)
+
+		if d.Symbol == "-" {
+			r *= -1
+		}
 		total += r
+
 		i++
 	}
 

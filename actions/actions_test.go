@@ -142,4 +142,22 @@ func TestRollAction(t *testing.T) {
 			t.Fail()
 		}
 	})
+
+	t.Run("Rolling negative results deducts on total", func(t *testing.T) {
+		// Given
+		action := RollAction{command: "/tira 1d20 -1d6 -20"}
+
+		// When
+		test, err := action.Resolve()
+
+		// Assert
+		if err != nil {
+			t.Logf("\nresult expected to be 'nil'\ngot '%s' error instead", err.Error())
+			t.Fail()
+		}
+		if !regexp.MustCompile(`1d20\[\d{1,2}\] -1d6\[\d{1,2}\] \-20 = -\d{1,2}`).MatchString(test) {
+			t.Logf("\nresult expected to be '1d20[<result>] -1d6[<result>] -20 = <total>'\ngot '%s' instead", test)
+			t.Fail()
+		}
+	})
 }
