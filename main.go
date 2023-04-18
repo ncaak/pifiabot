@@ -25,8 +25,7 @@ func handleUpdate(w http.ResponseWriter, r *http.Request) {
 		var command = actions.Factory(input.Text)
 		var response, err = command.Resolve()
 		if err != nil {
-			log.Println("ERROR :: Resolving a command : " + err.Error()) // TODO: send message with command help
-			return
+			response = config.Get().Message(err.Error())
 		}
 
 		var output = models.Output{
@@ -61,8 +60,8 @@ func main() {
 	log.Fatal(
 		http.ListenAndServeTLS(
 			":"+config.Get().Url.Port,
-			config.Get().CertFilePath,
-			config.Get().KeyFilePath,
+			config.Get().File.Certificate,
+			config.Get().File.PrivateKey,
 			nil),
 	)
 }

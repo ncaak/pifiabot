@@ -21,7 +21,6 @@ COPY --from=compiler /go/bin/pifiabot /app/
 
 ADD ./deploy/cert.pem /app/
 ADD ./deploy/private.key /app/
-
-EXPOSE 443
+ADD ./deploy/messages.json /app/
 
 CMD ["./pifiabot"]
