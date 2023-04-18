@@ -10,7 +10,6 @@ import (
 const MAX_DICE_NUMBER = 20
 const MAX_DICE_FACES = 100
 
-// TODO : Unexport struct and make it work as interface
 type Dice struct {
 	Algebra   string
 	Symbol    string
@@ -43,6 +42,10 @@ func (d *Dice) PreCheck() error {
 		return fmt.Errorf("faces_number")
 	}
 
+	if d.Drop != "" && d.numberVal == 1 {
+		return fmt.Errorf("no_drop")
+	}
+
 	return err
 }
 
@@ -62,5 +65,43 @@ func (d Dice) Roll() (results []int, total int) {
 		i++
 	}
 
+	if d.Drop != "" {
+		total -= d.dropFromTotal(results)
+	}
+
 	return
+}
+
+func (d Dice) dropFromTotal(results []int) int {
+	var initValue int
+	var from func(int, int) int
+
+	switch d.Drop {
+	case "-L":
+		initValue = d.facesVal
+		from = func(c int, v int) int {
+			if c > v {
+				return v
+			}
+			return c
+		}
+
+	case "-H":
+		initValue = 0
+		from = func(c int, v int) int {
+			if c < v {
+				return v
+			}
+			return c
+		}
+	default:
+		return 0
+	}
+
+	valueToDrop := initValue
+	for _, r := range results {
+		valueToDrop = from(valueToDrop, r)
+	}
+
+	return valueToDrop
 }

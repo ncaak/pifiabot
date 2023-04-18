@@ -45,5 +45,3 @@ func (a RollAction) Resolve() (string, error) {
 
 	return strings.Join(message, " "), nil
 }
-
-// TODO> drops
