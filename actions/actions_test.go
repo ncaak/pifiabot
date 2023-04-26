@@ -50,6 +50,17 @@ func TestActionsFactory(t *testing.T) {
 			t.Fail()
 		}
 	})
+
+	t.Run("'repite' command returns a RepeatAction instance", func(t *testing.T) {
+		// When
+		test := Factory("/repite 2 1d20")
+
+		// Assert
+		if action := reflect.TypeOf(test).String(); action != "actions.RepeatAction" {
+			t.Logf("\nresult expected to be 'actions.RepeatAction'\ngot '%s' instead", action)
+			t.Fail()
+		}
+	})
 }
 
 func TestRollAction(t *testing.T) {
