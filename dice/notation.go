@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-const REGEX_DICE_NOTATION = `([-\+\s])\s?(\d*)d(\d+)(-[HL])?`
+const REGEX_DICE_NOTATION = `(^|[-\+\s])\s?(\d*)d(\d+)(-[HL])?`
 const REGEX_BONUS_NOTATION = `([+-]\d+)`
 
 type Notation struct {

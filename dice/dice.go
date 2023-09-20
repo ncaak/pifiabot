@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"math/rand"
 	"strconv"
-	"time"
 )
 
 const MAX_DICE_NUMBER = 20
@@ -50,8 +49,6 @@ func (d *Dice) PreCheck() error {
 }
 
 func (d Dice) Roll() (results []int, total int) {
-	rand.Seed(time.Now().UnixNano())
-
 	i := 0
 	for i < d.numberVal {
 		r := rand.Intn(d.facesVal) + 1
