@@ -8,6 +8,8 @@ import (
 	"github.com/ncaak/pifiabot/dice"
 )
 
+const MAX_ITERATIONS = 10
+
 type RepeatAction struct {
 	command    string
 	iterations int
@@ -21,6 +23,9 @@ func (a RepeatAction) Resolve() (string, error) {
 	a.iterations, err = strconv.Atoi(params[1])
 	if err != nil {
 		return "", fmt.Errorf(MSG_UNKNOWN_ACTION)
+	}
+	if a.iterations > MAX_ITERATIONS {
+		return "", fmt.Errorf(ERR_REPEAT_MAXITER)
 	}
 
 	// Get notation that will be the same for every rep
@@ -41,11 +46,11 @@ func (a RepeatAction) getNotation(algebra string) (dice.Notation, error) {
 	var notation = dice.NewNotation(algebra)
 	d := notation.GetDice()
 	if len(d) == 0 {
-		return notation, fmt.Errorf(ERR_REPEAT)
+		return notation, fmt.Errorf(ERR_REPEAT_NODICE)
 	}
 
-	for _, die := range d {
-		err := die.PreCheck()
+	for i := range d {
+		err := d[i].PreCheck()
 		if err != nil {
 			return notation, err
 		}
@@ -58,13 +63,8 @@ func (a RepeatAction) solveNotation(n dice.Notation) string {
 	var message []string
 	var total int
 
-	d := n.GetDice()
-	// Command can accept no die to roll 1d20
-	if len(d) == 0 {
-		d = append(d, dice.D20())
-	}
-
 	// Append dice algebra and their results e.g. 1d20[20]
+	d := n.GetDice()
 	for _, die := range d {
 		results, subtotal := die.Roll()
 
