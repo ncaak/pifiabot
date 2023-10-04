@@ -24,8 +24,8 @@ func (a RepeatAction) Resolve() (string, error) {
 	if err != nil {
 		return "", fmt.Errorf(MSG_UNKNOWN_ACTION)
 	}
-	if a.iterations > MAX_ITERATIONS {
-		return "", fmt.Errorf(ERR_REPEAT_MAXITER)
+	if a.iterations < 1 || a.iterations > MAX_ITERATIONS {
+		return "", fmt.Errorf(ERR_REPEAT_ITER)
 	}
 
 	// Get notation that will be the same for every rep

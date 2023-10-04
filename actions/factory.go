@@ -7,7 +7,7 @@ const REGEX_REPEAT_ACTION = `^/repite(\s|$)`
 
 const MAX_COMMAND_LENGTH = 50
 const ERR_UNKNOWN = "unknown_error"
-const ERR_REPEAT_MAXITER = "repeat_maxiter_error"
+const ERR_REPEAT_ITER = "repeat_iter_error"
 const ERR_REPEAT_NODICE = "repeat_nodice_error"
 
 const MSG_UNKNOWN_ACTION = "unknown_action"

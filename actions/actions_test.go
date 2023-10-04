@@ -229,7 +229,7 @@ func TestRepeatAction(t *testing.T) {
 		}
 	})
 
-	t.Run("Exceeding the maximum number of repetitions returns an ERR_REPEAT_MAXITER error.", func(t *testing.T) {
+	t.Run("Exceeding the maximum number of repetitions returns an ERR_REPEAT_ITER error", func(t *testing.T) {
 		// Given
 		action := RepeatAction{command: "/repite 11 1d20"}
 
@@ -241,8 +241,26 @@ func TestRepeatAction(t *testing.T) {
 			t.Logf("\nresult expected to be an error\ngot 'nil' value instead")
 			t.FailNow()
 		}
-		if test.Error() != ERR_REPEAT_MAXITER {
-			t.Logf("\nresult expected to be '%s'\ngot '%s' instead", ERR_REPEAT_MAXITER, test.Error())
+		if test.Error() != ERR_REPEAT_ITER {
+			t.Logf("\nresult expected to be '%s'\ngot '%s' instead", ERR_REPEAT_ITER, test.Error())
+			t.Fail()
+		}
+	})
+
+	t.Run("Invalid number of repetitions returns an ERR_REPEAT_ITER error", func(t *testing.T) {
+		// Given
+		action := RepeatAction{command: "/repite 0 1d10"}
+
+		// When
+		_, test := action.Resolve()
+
+		// Assert
+		if test == nil {
+			t.Logf("\nresult expected to be an error\ngot 'nil' value instead")
+			t.FailNow()
+		}
+		if test.Error() != ERR_REPEAT_ITER {
+			t.Logf("\nresult expected to be '%s'\ngot '%s' instead", ERR_REPEAT_ITER, test.Error())
 			t.Fail()
 		}
 	})
