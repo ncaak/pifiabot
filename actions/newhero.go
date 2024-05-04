@@ -5,5 +5,6 @@ type NewHeroAction struct {
 }
 
 func (a NewHeroAction) Resolve() (string, error) {
-	return "test", nil
+	// TODO: Currently only DnD chars are returned
+	return RepeatAction{command: "/repite 6 4d6-L"}.Resolve()
 }
