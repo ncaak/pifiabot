@@ -2,6 +2,7 @@ package actions
 
 import "regexp"
 
+const REGEX_NEWPC_ACTION = `^/(pj)(\s|$)`
 const REGEX_ROLL_ACTION = `^/(t|tira)(\s|$)`
 const REGEX_REPEAT_ACTION = `^/repite(\s|$)`
 
@@ -27,6 +28,8 @@ func Factory(command string) ActionInterface {
 		return RollAction{command: command}
 	case regexp.MustCompile(REGEX_REPEAT_ACTION).MatchString(command):
 		return RepeatAction{command: command}
+	case regexp.MustCompile(REGEX_NEWPC_ACTION).MatchString(command):
+		return NewHeroAction{command: command}
 	default:
 		return UnknownAction{}
 	}

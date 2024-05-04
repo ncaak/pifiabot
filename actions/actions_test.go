@@ -62,6 +62,17 @@ func TestActionsFactory(t *testing.T) {
 			t.Fail()
 		}
 	})
+
+	t.Run("'pj' command returns a NewHeroAction instance", func(t *testing.T) {
+		// When
+		test := Factory("/pj")
+
+		// Assert
+		if action := reflect.TypeOf(test).String(); action != "actions.NewHeroAction" {
+			t.Logf("\nresult expected to be 'actions.NewHeroAction'\ngot '%s' instead", action)
+			t.Fail()
+		}
+	})
 }
 
 func TestRollAction(t *testing.T) {
