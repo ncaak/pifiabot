@@ -33,7 +33,6 @@ func Get() *config {
 func Setup() error {
 	var config = config{}
 	config.Url.Path = "updates" // TODO: Randomize url path
-	config.Url.Port = "8443"
 	config.File.Certificate = "cert.pem"
 	config.File.PrivateKey = "private.key"
 	config.File.Messages = "messages.json"
@@ -72,6 +71,11 @@ func (c *config) getEnvData() (err error) {
 
 	if c.Url.Endpoint, err = getEnvVariable("ENDPOINT"); err != nil {
 		return err
+	}
+
+	if c.Url.Port, err = getEnvVariable("PORT"); err != nil {
+		log.Println("WARNING :: Using default port 8443")
+		c.Url.Port = "8443"
 	}
 
 	return

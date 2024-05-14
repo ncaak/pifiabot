@@ -62,6 +62,17 @@ func TestActionsFactory(t *testing.T) {
 			t.Fail()
 		}
 	})
+
+	t.Run("'pj' command returns a NewHeroAction instance", func(t *testing.T) {
+		// When
+		test := Factory("/pj")
+
+		// Assert
+		if action := reflect.TypeOf(test).String(); action != "actions.NewHeroAction" {
+			t.Logf("\nresult expected to be 'actions.NewHeroAction'\ngot '%s' instead", action)
+			t.Fail()
+		}
+	})
 }
 
 func TestRollAction(t *testing.T) {
@@ -261,6 +272,26 @@ func TestRepeatAction(t *testing.T) {
 		}
 		if test.Error() != ERR_REPEAT_ITER {
 			t.Logf("\nresult expected to be '%s'\ngot '%s' instead", ERR_REPEAT_ITER, test.Error())
+			t.Fail()
+		}
+	})
+}
+
+func TestNewRoleAction(t *testing.T) {
+	t.Run("Base NewHeroAction returns 6 iterations of DnD char generation (4d6-L)", func(t *testing.T) {
+		// Given
+		action := NewHeroAction{command: "/pj"}
+
+		// When
+		test, err := action.Resolve()
+
+		// Assert
+		if err != nil {
+			t.Logf("\nresult expected to be nil\ngot '%s' error instead", err.Error())
+			t.FailNow()
+		}
+		if iter := strings.Count(test, "4d6-L"); iter != 6 {
+			t.Logf("\nresult expected to be 6\ngot '%d' instead", iter)
 			t.Fail()
 		}
 	})

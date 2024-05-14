@@ -1,4 +1,4 @@
-FROM golang:1.19-alpine AS compiler
+FROM golang:1.22-alpine AS compiler
 
 ENV APP pifiabot
 
@@ -14,6 +14,7 @@ FROM alpine
 ARG BOT_TOKEN
 ENV BOT_TOKEN ${BOT_TOKEN}
 ENV ENDPOINT ""
+ENV PORT ""
 
 WORKDIR /app
 

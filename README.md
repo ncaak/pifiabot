@@ -12,6 +12,10 @@ The app requires two environmental variables to work. It runs as a server receiv
 
 It is the external IP Address of the machine where the app is running. It is used to setup the webhook.
 
+**PORT**
+
+It's the port of the service exposed to the webhook callbacks. It is used to set the webhook.
+
 **BOT_TOKEN**
 
 It is the identifier that Telegram's Bot API sets on bot creation. It is used to communicate with the API.
@@ -19,6 +23,24 @@ It is the identifier that Telegram's Bot API sets on bot creation. It is used to
 ### Certificate
 
 The server runs under HTTPS protocol and uses a keypair with this format: __private.key__ and __cert.pem__.
+
+### Messages
+
+The program also expects a JSON formatted file with the messages to display, using error ids as keys. A dummy JSON file could be provided and the error ids would be displayed instead.
+
+Current format:
+```json
+{
+    "dice_number": "",
+    "faces_number": "",
+    "no_drop" : "",
+    "notation_max_length": "",
+    "repeat_iter_error": "",
+    "repeat_nodice_error": "",
+    "unknown_action": "",
+    "unknown_error": "",
+}
+```
 
 ### Deployment with Dockerfile
 
@@ -28,5 +50,12 @@ The server runs under HTTPS protocol and uses a keypair with this format: __priv
 
 #### Running the container
 
-```docker run -td -p 443:443 -e ENDPOINT=<endpoint_ip> <image_name>```
+```docker run -td -p <endpoint_port>:<endpoint_port> -e ENDPOINT=<endpoint_ip> -e PORT=<endpoint_port> <image_name>```
 
+#### Required files
+
+Both keys and the messages file should be available at build time in the following path:
+
+* `deploy/cert.pem`
+* `deploy/private.key`
+* `deploy/messages.json`
