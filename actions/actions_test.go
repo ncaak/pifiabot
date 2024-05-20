@@ -73,6 +73,17 @@ func TestActionsFactory(t *testing.T) {
 			t.Fail()
 		}
 	})
+
+	t.Run("'coc' command returns a CoCAction instance", func(t *testing.T) {
+		// When
+		test := Factory("/coc")
+
+		// Assert
+		if action := reflect.TypeOf(test).String(); action != "actions.CoCAction" {
+			t.Logf("\nresult expected to be 'actions.CoCAction'\ngot '%s' instead", action)
+			t.Fail()
+		}
+	})
 }
 
 func TestRollAction(t *testing.T) {
