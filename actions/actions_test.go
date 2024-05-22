@@ -186,7 +186,24 @@ func TestRollAction(t *testing.T) {
 }
 
 func TestRepeatAction(t *testing.T) {
-	t.Run("Wrong command returns an MSG_UNKNOWN_ACTION error", func(t *testing.T) {
+	t.Run("Empty command returns a MSG_UNKNOWN_ACTION error", func(t *testing.T) {
+		// Given
+		action := RepeatAction{command: "/repite"}
+
+		// When
+		_, test := action.Resolve()
+
+		// Assert
+		if test == nil {
+			t.Logf("\nresult expected to be an error\ngot 'nil' value instead")
+			t.FailNow()
+		}
+		if test.Error() != MSG_UNKNOWN_ACTION {
+			t.Logf("\nresult expected to be '%s'\ngot '%s' instead", MSG_UNKNOWN_ACTION, test.Error())
+			t.Fail()
+		}
+	})
+	t.Run("Wrong command returns a MSG_UNKNOWN_ACTION error", func(t *testing.T) {
 		// Given
 		action := RepeatAction{command: "/repite 10+3d20"}
 

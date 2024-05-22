@@ -19,6 +19,9 @@ type RepeatAction struct {
 func (a RepeatAction) Resolve() (string, error) {
 	var err error
 	var params []string = strings.SplitN(a.command, " ", 3)
+	if len(params) < 3 {
+		return "", fmt.Errorf(MSG_UNKNOWN_ACTION)
+	}
 	// Get reps or return an error
 	a.iterations, err = strconv.Atoi(params[1])
 	if err != nil {
