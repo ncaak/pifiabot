@@ -8,6 +8,9 @@ const REGEX_REPEAT_ACTION = `^/repite(\s|$)`
 const REGEX_ROLL_ACTION = `^/(t|tira)(\s|$)`
 
 const MAX_COMMAND_LENGTH = 50
+
+const ERR_COC_SKILL_LIMITS = "coc_skill_limits"
+const ERR_COC_WRONG_ARGUMENT = "coc_wrong_argument"
 const ERR_UNKNOWN = "unknown_error"
 const ERR_REPEAT_ITER = "repeat_iter_error"
 const ERR_REPEAT_NODICE = "repeat_nodice_error"
