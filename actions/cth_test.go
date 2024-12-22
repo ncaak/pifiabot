@@ -2,7 +2,7 @@ package actions
 
 import "testing"
 
-func TestCoCActionResolveErrors(t *testing.T) {
+func TestCthActionResolveErrors(t *testing.T) {
 	type errorCase struct {
 		name    string
 		command string
@@ -11,28 +11,28 @@ func TestCoCActionResolveErrors(t *testing.T) {
 
 	var tests = []errorCase{
 		{
-			name:    "Failure to send the skill value will return an ERR_COC_WRONG_ARGUMENT error",
-			command: "/coc",
-			errType: ERR_COC_WRONG_ARGUMENT,
+			name:    "Failure to send the skill value will return an ERR_CTH_WRONG_ARGUMENT error",
+			command: "/cth",
+			errType: ERR_CTH_WRONG_ARGUMENT,
 		}, {
-			name:    "Sending a non-numeric skill value will return an ERR_COC_WRONG_ARGUMENT error",
-			command: "/coc 1d100",
-			errType: ERR_COC_WRONG_ARGUMENT,
+			name:    "Sending a non-numeric skill value will return an ERR_CTH_WRONG_ARGUMENT error",
+			command: "/cth 1d100",
+			errType: ERR_CTH_WRONG_ARGUMENT,
 		}, {
-			name:    "Sending a negative skill value will return an ERR_COC_SKILL_LIMITS error",
-			command: "/coc -10",
-			errType: ERR_COC_SKILL_LIMITS,
+			name:    "Sending a negative skill value will return an ERR_CTH_SKILL_LIMITS error",
+			command: "/cth -10",
+			errType: ERR_CTH_SKILL_LIMITS,
 		}, {
-			name:    "Sending a skill value greater than 100 will return an ERR_COC_SKILL_LIMITS error",
-			command: "/coc 101",
-			errType: ERR_COC_SKILL_LIMITS,
+			name:    "Sending a skill value greater than 100 will return an ERR_CTH_SKILL_LIMITS error",
+			command: "/cth 101",
+			errType: ERR_CTH_SKILL_LIMITS,
 		},
 	}
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			// Given
-			action := CoCAction{command: tc.command}
+			action := CthAction{command: tc.command}
 
 			// When
 			_, test := action.Resolve()
@@ -50,7 +50,7 @@ func TestCoCActionResolveErrors(t *testing.T) {
 	}
 }
 
-func TestCoCActionResults(t *testing.T) {
+func TestCthActionResults(t *testing.T) {
 	type errorCase struct {
 		name       string
 		roll       int
@@ -90,7 +90,7 @@ func TestCoCActionResults(t *testing.T) {
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
 			// Given
-			action := CoCAction{}
+			action := CthAction{}
 
 			// When
 			test := action.result(tc.skillValue, tc.roll)
