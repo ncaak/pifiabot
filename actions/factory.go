@@ -2,15 +2,15 @@ package actions
 
 import "regexp"
 
-const REGEX_COC_ACTION = `^/(coc)(\s|$)`
+const REGEX_CTH_ACTION = `^/(cth)(\s|$)`
 const REGEX_NEWPC_ACTION = `^/(pj)(\s|$)`
 const REGEX_REPEAT_ACTION = `^/repite(\s|$)`
 const REGEX_ROLL_ACTION = `^/(t|tira)(\s|$)`
 
 const MAX_COMMAND_LENGTH = 50
 
-const ERR_COC_SKILL_LIMITS = "coc_skill_limits"
-const ERR_COC_WRONG_ARGUMENT = "coc_wrong_argument"
+const ERR_CTH_SKILL_LIMITS = "cth_skill_limits"
+const ERR_CTH_WRONG_ARGUMENT = "cth_wrong_argument"
 const ERR_UNKNOWN = "unknown_error"
 const ERR_REPEAT_ITER = "repeat_iter_error"
 const ERR_REPEAT_NODICE = "repeat_nodice_error"
@@ -28,8 +28,8 @@ func Factory(command string) ActionInterface {
 
 	switch {
 	// TODO: Define commands as they are coded
-	case regexp.MustCompile(REGEX_COC_ACTION).MatchString(command):
-		return CoCAction{command: command}
+	case regexp.MustCompile(REGEX_CTH_ACTION).MatchString(command):
+		return CthAction{command: command}
 	case regexp.MustCompile(REGEX_NEWPC_ACTION).MatchString(command):
 		return NewHeroAction{command: command}
 	case regexp.MustCompile(REGEX_REPEAT_ACTION).MatchString(command):
