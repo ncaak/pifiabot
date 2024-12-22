@@ -28,6 +28,7 @@ func getReplyJson(data models.Output) []byte {
 	var ba, err = getBytes(models.Reply{
 		ChatId:  data.ChatId,
 		ReplyId: data.MessageId,
+		Silent:  true,
 		Text:    data.Text,
 	})
 	if err != nil {
