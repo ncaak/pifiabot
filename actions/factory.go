@@ -7,7 +7,7 @@ const REGEX_NEWPC_ACTION = `^/(pj)(\s|$)`
 const REGEX_REPEAT_ACTION = `^/repite(\s|$)`
 const REGEX_ROLL_ACTION = `^/(t|tira)(\s|$)`
 
-const MAX_COMMAND_LENGTH = 50
+const MAX_COMMAND_LENGTH = 100
 
 const ERR_CTH_SKILL_LIMITS = "cth_skill_limits"
 const ERR_CTH_WRONG_ARGUMENT = "cth_wrong_argument"

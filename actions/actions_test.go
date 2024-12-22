@@ -21,7 +21,7 @@ func TestActionsFactory(t *testing.T) {
 
 	t.Run("command length is over the limit returns an ErrorAction instance", func(t *testing.T) {
 		// When
-		test := Factory("/tira 000000000000000000000000000000000000000000000")
+		test := Factory("/tira 00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000")
 
 		// Assert
 		if action := reflect.TypeOf(test).String(); action != "actions.ErrorAction" {
