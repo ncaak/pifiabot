@@ -21,7 +21,7 @@ func TestActionsFactory(t *testing.T) {
 
 	t.Run("command length is over the limit returns an ErrorAction instance", func(t *testing.T) {
 		// When
-		test := Factory("/tira 000000000000000000000000000000000000000000000")
+		test := Factory("/tira 00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000")
 
 		// Assert
 		if action := reflect.TypeOf(test).String(); action != "actions.ErrorAction" {
@@ -70,6 +70,17 @@ func TestActionsFactory(t *testing.T) {
 		// Assert
 		if action := reflect.TypeOf(test).String(); action != "actions.NewHeroAction" {
 			t.Logf("\nresult expected to be 'actions.NewHeroAction'\ngot '%s' instead", action)
+			t.Fail()
+		}
+	})
+
+	t.Run("'cth' command returns a CthAction instance", func(t *testing.T) {
+		// When
+		test := Factory("/cth")
+
+		// Assert
+		if action := reflect.TypeOf(test).String(); action != "actions.CthAction" {
+			t.Logf("\nresult expected to be 'actions.CthAction'\ngot '%s' instead", action)
 			t.Fail()
 		}
 	})
