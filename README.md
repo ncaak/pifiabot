@@ -31,6 +31,8 @@ The program also expects a JSON formatted file with the messages to display, usi
 Current format:
 ```json
 {
+    "cth_skill_limits": "",
+    "cth_wrong_argument": "",
     "dice_number": "",
     "faces_number": "",
     "no_drop" : "",
